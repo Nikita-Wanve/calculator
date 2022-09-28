@@ -1,0 +1,47 @@
+version : 2.1
+parameters:
+  func:
+    description: The operation to perform on the given numbers
+    type: enum
+    enum:
+      - "ADD"
+      - "SUB"
+  numA:
+    type: integer
+    description: "The first number"
+  numB:
+    type: integer
+    description: "The second number"
+
+commands:
+  add:
+    description: Install linting dependencies and run linting.
+    steps:
+      - checkout
+      - when:
+      condition:
+        equals: [ "ADD", <<parameters.func>> ]
+      steps:
+        - add:
+            numA: <<parameters.numA>>
+            numB: <<parameters.numB>>
+  test:
+    description: Run Unit and Integration tests.
+    steps:
+      - checkout
+      - run:
+          name: "Run unit tests"
+          command: echo "unit test passed"
+      - run:
+          name: "Eun integration tests"
+          command: echo "integration tests passed"
+jobs:
+  add-and-test:
+    docker:
+      - image: alpine:latest
+    steps:
+      - add
+      - test
+
+
+
