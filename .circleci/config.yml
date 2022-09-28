@@ -1,25 +1,46 @@
-version: 2.1
-commands: # a reusable command with parameters
-  greeting:
-    parameters:
-      to:
-        default: "world"
-        type: string
+version : 2.1
+parameters:
+  func:
+    description: The operation to perform on the given numbers
+    type: enum
+    enum:
+      - "ADD"
+      - "SUB"
+  numA:
+    type: integer
+    description: "The first number"
+  numB:
+    type: integer
+    description: "The second number"
+commands:
+  add:
+    description: Install linting dependencies and run linting.
     steps:
-      - run: echo "Hello <<parameters.to>>"
+      - checkout
+  - when:
+      condition:
+        equals: [ "ADD", <<parameters.func>> ]
+      steps:
+        - add:
+            numA: <<parameters.numA>>
+            numB: <<parameters.numB>>
+  test:
+    description: Run Unit and Integration tests.
+    steps:
+      - checkout
+      - run:
+          name: "Run unit tests"
+          command: echo "unit test passed"
+      - run:
+          name: "Eun integration tests"
+          command: echo "integration tests passed"
 jobs:
-  my-job:
+  add-and-test:
     docker:
-      - image: cimg/base:stable
-        auth:
-          username: mydockerhub-user
-          password: $DOCKERHUB_PASSWORD  # context / project UI env-var reference
+      - image: alpine:latest
     steps:
-      - greeting:
-          to: "My-Name"
-workflows:
-  my-workflow:
-    jobs:
-      - my-job
+      - add
+      - test
+
 
 

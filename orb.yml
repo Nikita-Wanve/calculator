@@ -12,13 +12,12 @@ parameters:
   numB:
     type: integer
     description: "The second number"
-
 commands:
   add:
     description: Install linting dependencies and run linting.
     steps:
       - checkout
-      - when:
+  - when:
       condition:
         equals: [ "ADD", <<parameters.func>> ]
       steps:
