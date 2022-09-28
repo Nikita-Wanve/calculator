@@ -1,46 +1,87 @@
-version : 2.1
-parameters:
-  func:
-    description: The operation to perform on the given numbers
-    type: enum
-    enum:
-      - "ADD"
-      - "SUB"
-  numA:
-    type: integer
-    description: "The first number"
-  numB:
-    type: integer
-    description: "The second number"
+# This code is licensed from CircleCI to the user under the MIT license.
+# See here for details: https://circleci.com/developer/orbs/licensing
+version: 2.1
+description: |
+    This orb will carry out math operations such as addition via reusable commands.
+display:
+    home_url: https://www.github.com/KyleTryon/calculator-orb
+    source_url: https://www.github.com/KyleTryon/calculator-orb
 commands:
-  add:
-    description: Install linting dependencies and run linting.
-    steps:
-      - checkout
-  - when:
-      condition:
-        equals: [ "ADD", <<parameters.func>> ]
-      steps:
-        - add:
-            numA: <<parameters.numA>>
-            numB: <<parameters.numB>>
-  test:
-    description: Run Unit and Integration tests.
-    steps:
-      - checkout
-      - run:
-          name: "Run unit tests"
-          command: echo "unit test passed"
-      - run:
-          name: "Eun integration tests"
-          command: echo "integration tests passed"
+    add:
+        description: |
+            Add together two numbers provides as integer parameters.
+        parameters:
+            numA:
+                description: The first number
+                type: integer
+            numB:
+                description: The second number
+                type: integer
+        steps:
+            - run:
+                command: |-
+                    #!/bin/bash
+                    ADD_RESULT=$(("${PARAM_NUMA}" + "${PARAM_NUMB}"))
+                    echo $ADD_RESULT
+                    touch /tmp/ADD_RESULT.txt
+                    echo $ADD_RESULT > /tmp/ADD_RESULT.txt
+                environment:
+                    PARAM_NUMA: <<parameters.numA>>
+                    PARAM_NUMB: <<parameters.numB>>
+                name: Adding <<parameters.numA>> + <<parameters.numB>>
+executors:
+    default:
+        description: |
+            This is a sample executor using Docker and Node. If you want to provide a custom environment in your orb, insert your image here. If you do not require an executor, you can simply delete this directory.
+        docker:
+            - image: cimg/node:<<parameters.tag>>
+        parameters:
+            tag:
+                default: lts
+                description: |
+                    Pick a specific cimg/node image variant: https://hub.docker.com/r/cimg/node/tags
+                type: string
 jobs:
-  add-and-test:
-    docker:
-      - image: alpine:latest
-    steps:
-      - add
-      - test
-
-
+    calc:
+        description: Perform a mathematical operation on two numbers and save the results.
+        docker:
+            - image: cimg/base:current
+        parameters:
+            func:
+                description: The operation to perform on the given numbers
+                enum:
+                    - ADD
+                    - SUB
+                    - MUL
+                    - DIV
+                type: enum
+            numA:
+                description: The first number
+                type: integer
+            numB:
+                description: The second number
+                type: integer
+        steps:
+            - checkout
+            - when:
+                condition:
+                    equals:
+                        - ADD
+                        - <<parameters.func>>
+                steps:
+                    - add:
+                        numA: <<parameters.numA>>
+                        numB: <<parameters.numB>>
+examples:
+    example:
+        description: |
+            Sample example description.
+        usage:
+            version: "2.1"
+            orbs:
+                <orb-name>: <namespace>/<orb-name>@1.2.3
+            workflows:
+                use-my-orb:
+                    jobs:
+                        - <orb-name>/<job-name>
 
